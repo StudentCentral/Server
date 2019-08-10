@@ -1,7 +1,7 @@
 module.exports = {
-  dbName: 'XRides',
+  dbName: 'AttendancePortal',
   database: {
-    url: `mongodb://localhost:27017/Dhiyo/${this.dbName}`,
+    url: `mongodb://localhost:27017/muj/${this.dbName}`,
     mongoOptions: { useNewUrlParser: true },
   },
 }
