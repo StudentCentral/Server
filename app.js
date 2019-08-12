@@ -3,6 +3,7 @@ const routes = require('./routes/index.js')
 const ejs = require('ejs')
 const path = require('path')
 const bodyParser = require('body-parser')
+const main = require('./main.js');
 var PORT = process.env.PORT;
 if (PORT == null || PORT == "") {
   PORT = 8000
@@ -27,5 +28,6 @@ mongoClient.connect(databaseConfig.database.url, databaseConfig.database.mongoOp
     app.locals.db = db
     app.listen(PORT, () => {
       console.log(`Website is alive at http://localhost:${PORT}`)
+      main(db);
     })
   })

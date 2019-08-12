@@ -8,11 +8,25 @@ router.get('/', function(req, res, next) {
 });
 
 // POST: create new booking
-router.post('/new_booking', async function(req, res, next) {
-  console.log('newBooking called')
+router.post('/new-entry', async function(req, res, next) {
+  console.log('new-entry called')
   let newBooking = req.body
 
-  db.newDocument(app.locals.db, 'test_collection', newBooking)  
+  db.newDocument(req.app.locals.db, 'test_collection', newBooking) 
+    .catch(err => console.log(err))
+    .then(doc => res.send(doc))
+})
+
+// POST: update entry
+router.post('/update-entry', async function(req, res, next) {
+  console.log('update-entry called')
+  let updateDetails = req.body
+  let identifier = updateDetails.identifier
+  let newProperty = updateDetails.newProperty
+
+  db.updateDocument(req.app.locals.db, 'test_collection', identifier, newProperty) 
+    .catch(err => console.log(err))
+    .then(doc => res.send(doc))
 })
 
 // POST: start attendance
@@ -36,7 +50,7 @@ router.post('/start-attendance', async function(req, res, next) {
     attendanceList: []
   };
 
-  db.newDocument(app.locals.db, 'teacherContainer', teacherContainer)
+  db.newDocument(req.app.locals.db, 'teacherContainer', teacherContainer)
     .catch(err => { console.log(err )})
     .then(result => {
       res.status(200).send(teacherContainer.qrCode);
@@ -51,19 +65,38 @@ router.post('/validate_attendance', async function(req, res, next) {
   let qrCode = stuff.qrCode;
   let teacherContainerID = qrCode.substring(0, qrCode.lastIndexOf('_'));
   
-  let container = await db.getDocument(app.locals.db, 'teacherContainer', { containerID: teacherContainerID});
+  let container = await db.getDocument(req.app.locals.db, 'teacherContainer', { containerID: teacherContainerID});
   if(container == null) {
     res.status(200).send(false);
   } else {
 
     let studentID = stuff.studentID;
     let subID = container.subjectID;
+    let identifier, details, list, updateQuery;
+    
     // update student
-    // update teacher
-    // update teacherContainer
-    container.attendanceList.push(studentID);
-
-    res.status(200).send(true);
+    identifier = { studentID: studentID };
+    details = await db.getDocument(req.app.locals.db, 'student', identifier);
+    list = details.subID == undefined ? [] : details.subID;
+    list.push(container.timestamp);
+    updateQuery = {};
+    updateQuery[subID] = list;
+    db.updateDocument(req.app.locals.db, 'student', identifier, updateQuery)
+      .catch(err => console.log(err))
+      .then(studentUpdate => {
+        
+        // update teacherContainer
+        list = container.attendanceList;
+        list.push(studentID);
+        identifier = { teacherID: container.teacherID };
+        updateQuery = {};
+        updateQuery.attendanceList = list;
+        db.updateDocument(req.app.locals.db, 'teacherContainer', identifier, updateQuery)
+          .catch(err => console.log(err))
+          .then(teacherContainerUpdate => {
+            res.status(200).send(true);
+          });
+      });
   }
 
 })

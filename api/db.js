@@ -16,12 +16,48 @@ module.exports = {
       }
     })
   },
+  
+  deleteCollection: async function(db, collectionName) {
+    return new Promise(resolve => {
+      try {
+        const collection = db.db(config.dbName).collection(collectionName);
+        collection.drop((err, delOK) => {
+          if(err)
+            throw err
+          if(delOK)
+            console.log(`${collectionName} deleted`);
+          resolve(true)
+        })
+      } catch(err) {
+        if(err)
+          throw err
+      }
+    })
+  },
 
   getDocument: async function(db, collectionName, uniqueProperty) {
     return new Promise(resolve => {
       try {
         const collection = db.db(config.dbName).collection(collectionName)
         collection.findOne(uniqueProperty, (err, doc) => {
+          if(err)
+            throw err
+          resolve(doc)
+        })
+      } catch(err) {
+        if(err)
+          throw err
+      }
+    })
+  },
+
+  updateDocument: async function(db, collectionName, uniqueProperty, newProperty) {
+    return new Promise(resolve => {
+      try {
+        const collection = db.db(config.dbName).collection(collectionName)
+        const updateQuery = { $set: newProperty }
+
+        collection.updateOne(uniqueProperty, updateQuery, (err, res) => {
           if(err)
             throw err
           resolve(doc)
