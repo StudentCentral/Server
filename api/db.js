@@ -60,7 +60,7 @@ module.exports = {
         collection.updateOne(uniqueProperty, updateQuery, (err, res) => {
           if(err)
             throw err
-          resolve(doc)
+          resolve(res)
         })
       } catch(err) {
         if(err)

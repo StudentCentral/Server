@@ -26,7 +26,7 @@ router.post('/update-entry', async function(req, res, next) {
 
   db.updateDocument(req.app.locals.db, 'test_collection', identifier, newProperty) 
     .catch(err => console.log(err))
-    .then(doc => res.send(doc))
+    .then(doc => res.status(200).send(doc))
 })
 
 // POST: start attendance
@@ -53,12 +53,12 @@ router.post('/start-attendance', async function(req, res, next) {
   db.newDocument(req.app.locals.db, 'teacherContainer', teacherContainer)
     .catch(err => { console.log(err )})
     .then(result => {
-      res.status(200).send(teacherContainer.qrCode);
+      res.status(201).send(teacherContainer.qrCode);
     });
 });
 
 // POST: validate attendance
-router.post('/validate_attendance', async function(req, res, next) {
+router.post('/validate-attendance', async function(req, res, next) {
   console.log('validate-attendance called')
   let stuff = req.body;
 
@@ -98,8 +98,64 @@ router.post('/validate_attendance', async function(req, res, next) {
           });
       });
   }
+});
 
-})
+// POST: create-student
+router.post('/create-student', async function(req, res, next) {
+  console.log('create-student called');
+  let stuff = req.body;
+
+  // check for preexisting teacher with teacherID
+  let oldDoc = await db.getDocument(req.app.locals.db, 'student', { studentID: stuff.studentID })
+    .catch(err => {
+      console.log(err); 
+      res.status(500).send(undefined);
+    })
+  
+  // if doc exists, do not create document
+  if(oldDoc !== null) {
+    res.status(400).send('Student exists already.')
+  }  // else create document
+  else {
+    db.newDocument(req.app.locals.db, 'student', stuff)
+    .catch(err => { 
+      console.log(err); 
+      res.status(500).send(undefined); 
+    })
+    .then(newDoc => {
+      res.status(201).send(newDoc.studentID);
+    });
+  }
+  
+});
+
+// POST: create-teacher
+router.post('/create-teacher', async function(req, res, next) {
+  console.log('create-teacher called');
+  let stuff = req.body;
+
+  // check for preexisting teacher with teacherID
+  let oldDoc = await db.getDocument(req.app.locals.db, 'teacher', { teacherID: stuff.teacherID })
+    .catch(err => {
+      console.log(err); 
+      res.status(500).send(undefined);
+    })
+  
+  // if doc exists, do not create document
+  if(oldDoc !== null) {
+    res.status(400).send('Teacher exists already.')
+  }  // else create document
+  else {
+    db.newDocument(req.app.locals.db, 'teacher', stuff)
+    .catch(err => { 
+      console.log(err); 
+      res.status(500).send(undefined); 
+    })
+    .then(newDoc => {
+      res.status(201).send(newDoc.teacherID);
+    });
+  }
+});
 
 const generateContainerID = (teacherID, subjectID, timestamp) => {
   const dateOb = new Date(timestamp);

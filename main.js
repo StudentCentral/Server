@@ -22,7 +22,7 @@ const main = (dbRef) => {
 }
 
 const transferTeacherContainers = async (dbRef) => {
-
+  console.log('transferTeacherContainers called')
   try {
     let teacherContainerList = await db.getDocumentList(dbRef, 'teacherContainer', {});
     let status = true;

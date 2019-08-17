@@ -4,18 +4,30 @@
 <head>
     <meta charset="utf-8" />
     <title>Sample Title</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
     <link rel="stylesheet" type="text/css" media="screen" href="/static/css/index.css" />
-    <script src="/static/js/index.js"></script>
+    <!-- <script src="/static/js/index.js"></script> -->
 </head>
 
 <body>
-    <button onclick="newEntry()">newEntry</button>
-    <button onclick="updateEntry()">updateEntry</button>
+    <input id="input-teacherID" placeholder="teacherID">
+    <input id="input-subjectID" placeholder="input-subjectID">
+    <input id="input-date" placeholder="date">
+    <input id="input-month" placeholder="month">
+    <input id="input-year" placeholder="year">
+    <input id="input-hour" placeholder="hour">
 
+
+    <button onclick="newTeacher()">newTeacher</button>
+    <button onclick="newStudent()">newStudent</button>
+    <button onclick="startAttendance()">startAttendance</button>
+    <button onclick="validateAttendance()">validateAttendance</button>
+
+    <div id="qrcode"></div>
 
     <script src="/static/js/jquery.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <script src="/static/js/index.js"></script>
 </body>
 
