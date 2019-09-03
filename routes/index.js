@@ -2,12 +2,13 @@ var express = require('express')
 var router = express.Router()
 var db = require('../api/db.js');
 
-// GET: serve page
+// GET: serve page (PROTOTYPE)
 router.get('/', function(req, res, next) {
   res.status(200).render('index.html')
 });
 
-// POST: create new booking
+
+// POST: create new booking (PROTOTYPE)
 router.post('/new-entry', async function(req, res, next) {
   console.log('new-entry called')
   let newBooking = req.body
@@ -28,6 +29,7 @@ router.post('/update-entry', async function(req, res, next) {
     .catch(err => console.log(err))
     .then(doc => res.status(200).send(doc))
 })
+
 
 // POST: start attendance
 router.post('/start-attendance', async function(req, res, next) {
@@ -128,6 +130,34 @@ router.post('/create-student', async function(req, res, next) {
   }
   
 });
+
+// GET: get-student
+router.get('/get-student', async (req, res, next) => {
+   console.log('get-student')
+   const stuff = req.query
+   console.log(stuff)
+   const studentDoc = await db.getDocument(req.app.locals.db, 'student', { studentID: stuff.studentID })
+                        .catch(err => {
+                          console.log('get-student')
+                          console.log(stuff)
+                          res.send(null)
+                        })
+   res.status(200).send(studentDoc)
+})
+
+// GET: get-teacher
+router.get('/get-teacher', async (req, res, next) => {
+  console.log('get-teacher')
+  const stuff = req.query
+  console.log(stuff)
+  const teacherDoc = await db.getDocument(req.app.locals.db, 'teacher', { teacherID: stuff.teacherID })
+                       .catch(err => {
+                         console.log('get-teacher')
+                         console.log(stuff)
+                         res.send(null)
+                       })
+  res.status(200).send(teacherDoc)
+})
 
 // POST: create-teacher
 router.post('/create-teacher', async function(req, res, next) {

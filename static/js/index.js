@@ -1,5 +1,63 @@
 var qrcode = new QRCode("qrcode");
 
+// PROTOTYPE
+const test = function() {
+  console.log('test')
+  axios.get('/get-student', {
+    params: {
+      studentID: 'j_179301184',
+    }
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  })
+  .then(function () {
+    // always executed
+  });
+}
+
+const getTeacher = function() {
+  let teacherID = $("#input-teacherID").val()
+
+  axios.get('/get-teacher', {
+    params: {
+      teacherID: teacherID,
+    }
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  })
+  .then(function () {
+    // always executed
+  });
+}
+
+const getStudent = function() {
+  let studentID = $("#input-teacherID").val()
+
+  axios.get('/get-student', {
+    params: {
+      studentID: studentID,
+    }
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  })
+  .then(function () {
+    // always executed
+  });
+}
+
+// PROTOTYPE
 const newEntry = function() {
   let ob = {
     name: 'svr8',
@@ -15,6 +73,7 @@ const newEntry = function() {
   });
 }
 
+// PROTOTYPE
 const updateEntry = function() {
   let identifier = {
     name: 'svr8'
@@ -47,8 +106,9 @@ const newTeacher = () => {
   doStuff('create-teacher', teacher)  
 }
 const newStudent = () => {
+  let studentID = $("#input-teacherID").val()
   let student = {
-    studentID: 12345678,
+    studentID: studentID,
     name: 'testX'
   }
 
