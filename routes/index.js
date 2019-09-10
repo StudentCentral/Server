@@ -18,7 +18,7 @@ router.post('/new-entry', async function(req, res, next) {
     .then(doc => res.send(doc))
 })
 
-// POST: update entry
+// POST: update entry (PROTOTYPE)
 router.post('/update-entry', async function(req, res, next) {
   console.log('update-entry called')
   let updateDetails = req.body
@@ -79,7 +79,7 @@ router.post('/validate-attendance', async function(req, res, next) {
     // update student
     identifier = { studentID: studentID };
     details = await db.getDocument(req.app.locals.db, 'student', identifier);
-    list = details.subID == undefined ? [] : details.subID;
+    list = details[subID] == undefined ? [] : details[subID];
     list.push(container.timestamp);
     updateQuery = {};
     updateQuery[subID] = list;
@@ -157,6 +157,27 @@ router.get('/get-teacher', async (req, res, next) => {
                          res.send(null)
                        })
   res.status(200).send(teacherDoc)
+})
+
+router.get('/get-student-subject-attendance', async function(req, res, next) {
+  console.log('get-student-subject-attendance called')
+  let stuff = req.body
+
+  let studentDoc = await db.getDocument(req.app.locals.db, 'student', { studentID: stuff.studentID })
+                    .catch(err => {
+                      console.log(err)
+                      res.status(500).send(null)
+                    });
+
+  if(studentDoc == null)
+    res.status(404).send([]);
+
+  let attendanceList = []
+  if(studentDoc[stuff.subjectID]) 
+     attendanceList == studentDoc[stuff.subjectID];
+     
+  res.status(200).send(attendanceList)
+  
 })
 
 // POST: create-teacher

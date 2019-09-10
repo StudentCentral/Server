@@ -150,8 +150,8 @@ const startAttendance = () => {
 
 const validateAttendance = () => {
   let ob = {
-    qrCode: '12345678_CS101_4-7-0_3',
-    studentID: 12345678
+    qrCode: '12345_cs123_5-7-7_1',
+    studentID: 't_179301184'
   }
 
   doStuff('validate-attendance', ob);
