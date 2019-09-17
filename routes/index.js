@@ -89,7 +89,8 @@ router.post('/validate-attendance', async function(req, res, next) {
         
         // update teacherContainer
         list = container.attendanceList;
-        list.push(studentID);
+        if(!list.includes(studentID))
+          list.push(studentID);
         identifier = { teacherID: container.teacherID };
         updateQuery = {};
         updateQuery.attendanceList = list;
@@ -161,7 +162,7 @@ router.get('/get-teacher', async (req, res, next) => {
 
 router.get('/get-student-subject-attendance', async function(req, res, next) {
   console.log('get-student-subject-attendance called')
-  let stuff = req.body
+  let stuff = req.query
 
   let studentDoc = await db.getDocument(req.app.locals.db, 'student', { studentID: stuff.studentID })
                     .catch(err => {
