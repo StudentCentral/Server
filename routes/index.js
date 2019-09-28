@@ -36,6 +36,7 @@ router.post('/start-attendance', async function(req, res, next) {
   console.log('start-attendance called');
   let stuff = req.body;
 
+  stuff.timestamp = new Date(stuff.year, stuff.month, stuff.day, stuff.hours, 0, 0, 0);
   let containerID = generateContainerID(stuff.teacherID, stuff.subjectID, stuff.timestamp);
 
   // teacherID, subID, timestamp
@@ -59,7 +60,7 @@ router.post('/start-attendance', async function(req, res, next) {
     });
 });
 
-// POST: validate attendance
+// POST: validate-attendance
 router.post('/validate-attendance', async function(req, res, next) {
   console.log('validate-attendance called')
   let stuff = req.body;
@@ -101,6 +102,47 @@ router.post('/validate-attendance', async function(req, res, next) {
           });
       });
   }
+});
+
+// POST: trigger-attendance
+router.post('/trigger-student', async function(req, res, next) {
+  console.log('trigger-attendance called');
+  let stuff = req.body;
+
+  // UPDATE TEACHER
+  let listIndentifier = {
+    teacherID: stuff.teacherID,
+    subjectID: stuff.subjectID
+  }
+
+  let subjectRecord = await db.getPartialDocumentList(req.app.locals.db, 'student', listIndentifier, { "attendanceList": 1})
+            .catch(err => { console.log(err); res.status(503).send(null); });
+  
+  if(subjectRecord==undefined || subjectRecord==null) subjectRecord = {};
+
+  let timestampIdentifier = new Date(stuff.year, stuff.month, stuff.day, stuff.hours, 0, 0, 0);
+  for(let i = 0; i<subjectRecord.length; i++) {
+    let classDate = new Date(subjectRecord[i].timestamp);
+    if(classDate.getTime() == timestampIdentifier.getTime()) {
+      if(!subjectRecord[i].attendanceList.includes(stuff.studentID))
+        subjectRecord[i].attendanceList.push(stuff.studentID);
+      break;
+    }
+  }
+
+  // UPDATE STUDENT
+  let identifier = { studentID: stuff.studentID };
+  let details = await db.getDocument(req.app.locals.db, 'student', identifier);
+  list = details[stuff.subjectID] == undefined ? [] : details[stuff.subjectID];
+  if(!list.contains(timestampIdentifier))
+    list.push(timestampIdentifier);
+  updateQuery = {};
+  updateQuery[stuff.subjectID] = list;
+  db.updateDocument(req.app.locals.db, 'student', identifier, updateQuery)
+    .catch(err => { console.log(err); res.status(500).send(null); })
+    .then(studentUpdate => {
+      res.status(201).send(true);
+    });
 });
 
 // POST: create-student

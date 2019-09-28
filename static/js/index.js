@@ -95,6 +95,11 @@ const updateEntry = function() {
   });
 }
 
+// PROTOTYPE
+const triggerAttendance = function() {
+  doStuff('trigger-student');
+}
+
 const newTeacher = () => {
   let teacherID = $("#input-teacherID").val()
 

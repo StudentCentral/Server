@@ -51,6 +51,33 @@ module.exports = {
     })
   },
 
+  getPartialDocumentList: async function(db, collectionName, uniqueProperty, requiredFields) {
+    return new Promise(resolve => {
+      try {
+        const collection = db.db(config.dbName).collection(collectionName)
+        let projectionQuery = {}
+        for(let field in requiredFields)
+          projectionQuery[field] = 1;
+
+        collection.find( uniqueProperty, { projection: projectionQuery }
+          ).toArray(function(err, result) {
+          if (err) throw err;
+          resolve(result);
+      });
+
+        // const collection = db.db(config.dbName).collection(collectionName)
+        // collection.findOne(uniqueProperty, requiredFields, (err, doc) => {
+        //   if(err)
+        //     throw err
+        //   resolve(doc)
+        // })
+      } catch(err) {
+        if(err)
+          throw err
+      }
+    })
+  },
+
   updateDocument: async function(db, collectionName, uniqueProperty, newProperty) {
     return new Promise(resolve => {
       try {
