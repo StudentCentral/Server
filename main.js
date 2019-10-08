@@ -34,16 +34,38 @@ const transferTeacherContainers = async (dbRef) => {
       let updates = {};
       updates.timestamp = teacherContainer.timestamp;
       updates.attendanceList = teacherContainer.attendanceList;
-
+    
+      // get all teacher details
       let teacherDetails = await db.getDocument(dbRef, 'teacher', 
         { teacherID: teacherContainer.teacherID}
       );
+
+      // if this is first class, create empty array
       if(teacherDetails[subjectID] == undefined)
         teacherDetails[subjectID] = [];
-      teacherDetails[subjectID].push(updates);
-      let updateQuery = {};
-      updateQuery[subjectID] = teacherDetails[subjectID];
+      
+      // if class already exists, update attendancelist
+      let curTime = new Date(updates.timestamp);
+      let classList = teacherDetails[subjectID];
+      for(let i = 0; i<classList.length; i++) {
+        let classDetail = classList[i];
+        let d1 = new Date(classDetail.timestamp);
+        if(d1.getTime() == curTime.getTime()) {
+          flag = true;
+          updates.attendanceList = updates.attendanceList.concat(classDetail.attendanceList);
+        }
+      }
 
+      // if class didnt't exist already, create new class
+      if(!flag) {
+        classList.push(updates);
+      }
+
+      // generate mongodb update query
+      let updateQuery = {};
+      updateQuery[subjectID] = classList;
+      
+      // update teacher classList
       db.updateDocument(dbRef, 'teacher', 
         {teacherID: teacherDetails.teacherID},
         updateQuery
